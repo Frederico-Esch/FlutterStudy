@@ -22,8 +22,12 @@ class _EnterNewTodoState extends State<EnterNewTodo> {
     if (todoList.isEmpty) return <Widget>[];
 
     var result = <Widget>[];
-    todoList.asMap().forEach((key, value) =>
-        result.add(TodoCard(item: value, id: key, func: unMark)));
+    todoList.asMap().forEach((key, value) => result.add(TodoCard(
+          item: value,
+          id: key,
+          func: unMark,
+          del: delete,
+        )));
     return result;
   }
 
@@ -31,6 +35,9 @@ class _EnterNewTodoState extends State<EnterNewTodo> {
     setState(() {
       todoList[id].marked = value ?? !todoList[id].marked;
     });
+    con!
+        .setStringList(id.toString(), todoList[id].toListString())
+        .then((value) => null);
   }
 
   void createTodo() {
@@ -40,19 +47,40 @@ class _EnterNewTodoState extends State<EnterNewTodo> {
       todoList.add(TODO(todoTextField.text));
       todoTextField.text = "";
     });
+    con!
+        .setStringList(
+          (todoList.length - 1).toString(),
+          todoList.last.toListString(),
+        )
+        .then((value) => null);
+  }
+
+  Future delete(TODO item) async {
+    final index = todoList.indexOf(item);
+    todoList.remove(item);
+    await con!.clear();
+    todoList.asMap().forEach((key, value) async {
+      await con!.setStringList(key.toString(), value.toListString());
+    });
+    setState(() {});
   }
 
   Future loadList() async {
     con = await SharedPreferences.getInstance();
-    if (con?.getKeys().contains("TODOS") ?? false) {
-      todoList = TODO.fromString(con!.getStringList("TODOS")!);
+    print(con?.getKeys() ?? "nada");
+    if (con?.getKeys().isNotEmpty ?? false) {
+      for (String key in con!.getKeys()) {
+        todoList.add(TODO.fromString(con!.getStringList(key)!));
+      }
     }
   }
 
   @override
   void initState() {
     super.initState();
-    loadList().then((value) => setState(() {}));
+    loadList().then((value) {
+      setState(() {});
+    });
   }
 
   @override
@@ -77,11 +105,5 @@ class _EnterNewTodoState extends State<EnterNewTodo> {
         ),
       ],
     );
-  }
-
-  @override
-  void deactivate() {
-    con!.setStringList("TODOS", TODO.toListString(todoList));
-    super.deactivate();
   }
 }
