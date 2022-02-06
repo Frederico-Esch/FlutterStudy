@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gerenciamento_de_financas/Components/divider_with_text.dart';
 import 'package:gerenciamento_de_financas/Components/form_transacao.dart';
 import 'package:gerenciamento_de_financas/Components/transaction_card.dart';
+import 'package:gerenciamento_de_financas/Components/chart.dart';
 
 import 'models/transaction.dart';
 
@@ -30,24 +31,14 @@ class MainApp extends StatelessWidget {
             fontSize: 22,
             fontWeight: FontWeight.bold
           )
+        ),
+        primaryColor: Colors.indigo[900],
+        colorScheme: Theme.of(context).colorScheme.copyWith(
+            brightness: Brightness.dark,
+            primary: Colors.indigo.shade900,
+            secondary: Colors.indigoAccent,
         )
       ),
-
-      /*
-      theme: ThemeData.dark().copyWith(
-        textTheme: ThemeData.dark().textTheme.apply(
-          fontFamily: "Quicksand",
-        ),
-        appBarTheme: ThemeData.dark().appBarTheme.copyWith(
-          titleTextStyle: const TextStyle(
-            fontFamily: "OpenSans",
-            fontSize: 22,
-            fontWeight: FontWeight.bold
-          )
-        )
-      )
-      */
-
     );
   }
 }
@@ -61,7 +52,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  final _transactions = <Transaction>[];
+  final _transactions = <Transaction>[
+    Transaction(id: 1, nome: "SEILA", valor: 1500, data: DateTime.now().subtract(Duration(days:1))),
+    Transaction(id: 1, nome: "OUTRA COISA", valor: 720, data: DateTime.now().subtract(Duration(days:2))),
+  ];
+
+  List<Transaction> get _recentTransactions =>
+    _transactions.where((element) => element.data.isAfter(DateTime.now().subtract(Duration(days: 7)))).toList();
+  
 
   void _openForm(BuildContext context){
     showModalBottomSheet(
@@ -113,7 +111,8 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
 
-          Card(child: Container(child: const Text("Grupo"), padding: const EdgeInsets.all(10), alignment: Alignment.center), elevation: 10), //AONDE VAI TA A TABELA BONITA
+          //Card(child: Container(child: const Text("Grupo"), padding: const EdgeInsets.all(10), alignment: Alignment.center), elevation: 10), //AONDE VAI TA A TABELA BONITA
+          Chart(recentTransactions: _recentTransactions),
           const DividerWithText(text: "Lista de Transações"),
           Expanded(
             child: _transactions.isEmpty 
