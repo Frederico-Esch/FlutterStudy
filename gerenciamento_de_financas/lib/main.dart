@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
 
   final _transactions = <Transaction>[
     Transaction(id: 1, nome: "SEILA", valor: 1500, data: DateTime.now().subtract(Duration(days:1))),
-    Transaction(id: 1, nome: "OUTRA COISA", valor: 720, data: DateTime.now().subtract(Duration(days:2))),
+    Transaction(id: 2, nome: "OUTRA COISA", valor: 720, data: DateTime.now().subtract(Duration(days:2))),
   ];
 
   List<Transaction> get _recentTransactions =>
@@ -63,14 +63,15 @@ class _HomePageState extends State<HomePage> {
 
   void _openForm(BuildContext context){
     showModalBottomSheet(
-        context: context,
-        builder: (ctx){
-          return FormTransacao(submit: _addTransaction);
-        }
+      isScrollControlled: true,
+      context: context,
+      builder: (ctx){
+        return FormTransacao(submit: _addTransaction);
+      }
     );
   }
 
-  void _addTransaction(String? nome, String? valor, bool entrada, BuildContext context){
+  void _addTransaction(String? nome, String? valor, bool entrada, DateTime data, BuildContext context){
     nome = nome ?? "";
     valor = valor ?? "0";
     if(nome.trim() == "" || valor == "0"){
@@ -83,7 +84,7 @@ class _HomePageState extends State<HomePage> {
       id = Random().nextInt(10 * 10 * 10 * 10 * 10);
     }while(_transactions.where((element) => element.id == id).isNotEmpty);
 
-    _transactions.add(Transaction(id: id, nome: nome, valor: double.parse(valor), data: DateTime.now(), entrada: entrada));
+    _transactions.add(Transaction(id: id, nome: nome, valor: double.parse(valor), data: data, entrada: entrada));
     setState(() {});
 
     Navigator.of(context).pop();
@@ -107,6 +108,7 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(color: Colors.white),
         ),
       ),
+      resizeToAvoidBottomInset: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -125,7 +127,14 @@ class _HomePageState extends State<HomePage> {
             : ListView.builder(
               itemCount: _transactions.length,
               physics: const BouncingScrollPhysics(),
-              itemBuilder: (ctx, index) => TransactionCard(transacao:_transactions[index])
+              itemBuilder: (ctx, index) => Dismissible(
+                  key: Key(_transactions[index].id.toString()),
+                  child: TransactionCard(transacao:_transactions[index]),
+                  onDismissed: (_) {
+                    _transactions.removeAt(index);
+                    setState((){});
+                  },
+              )
             ),
           )
         ],

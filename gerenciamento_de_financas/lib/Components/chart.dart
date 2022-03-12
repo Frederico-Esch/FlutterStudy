@@ -26,7 +26,7 @@ class _ChartState extends State<Chart> {
 
       //print("VALOR -> " + weekDay + totalSum.toString() + "\n");
 
-      resultado[weekDay] = totalSum;
+      resultado[weekDay] = totalSum >= 0 ? totalSum : 0;
     }
 
     return resultado;
