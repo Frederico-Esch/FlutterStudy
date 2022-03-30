@@ -25,6 +25,12 @@ class MyApp extends StatelessWidget {
                 fontSize: 20,
                 fontFamily: "RobotoCondensed",
               ),
+              labelMedium: TextStyle(
+                color: Colors.white,
+                backgroundColor: Colors.grey.withOpacity(.7),
+                fontSize: 20,
+                fontFamily: "RobotoCondensed",
+              ),
             ),
       ),
       routes: {

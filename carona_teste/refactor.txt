@@ -1,0 +1,1 @@
+Trocar as screens por rederizações de componentes numa screen só (em referencia a login, Ob-Cap, Cap-Ob e Carona

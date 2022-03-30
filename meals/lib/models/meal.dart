@@ -1,5 +1,3 @@
-import 'package:meals/models/category.dart';
-
 enum Complexity { simple, medium, difficult }
 
 enum Cost { cheap, fair, expensive }
